@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+    <h1>Weather App</h1>
+    <div class="input-container">
+        <input type="text" id="city" placeholder="Enter city" class="city-input">
+        <button onclick="getWeather()" class="get-weather-button">Get Weather</button>
+    </div>
+    <div id="weather" class="weather-info"></div>
+</div>
+
+<script>
+    async function getWeather() {
+        const city = document.getElementById('city').value;
+        const response = await fetch(`/weather?city=${city}`);
+        if (response.ok) {
+            const data = await response.json();
+            console.log('API Response:', data);
+
+            const backgroundImageUrl = getBackgroundImage(data.current.condition.text);
+            console.log('Background Image URL:', backgroundImageUrl);
+
+            document.getElementById('weather').innerHTML = `
+                    <h2>${data.location.name}</h2>
+                    <p>Temperature: ${data.current.temp_c}°C</p>
+                    <p>Condition: ${data.current.condition.text}
+                        <img src="${backgroundImageUrl}" alt="${data.current.condition.text}" class="background-icon">
+                    </p>
+                `;
+        } else {
+            const error = await response.text();
+            console.error('Error fetching weather data:', error);
+            document.getElementById('weather').innerHTML = `
+                    <p>Error fetching weather data.</p>
+                `;
+        }
+    }
+
+
+function getBackgroundImage(condition) {
+        switch (condition.toLowerCase()) {
+            case 'sunny':
+                return '/images/sunny.jpg';
+            case 'cloudy':
+                return '/images/cloudy.jpg';
+            case 'partly cloudy':
+                return '/images/partlycloudy.jpg';
+            case 'rainy':
+                return '/images/rainy.jpg';
+            default:
+                return '';
+        }
+    }
+</script>
+</body>
+</html>
+
